@@ -4,6 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine/lib/index');
 
+const logSuccess = text => console.log(color.green(text));
+const logError = text => console.log(color.red(text));
+
 const replaceSlashes = pathString => pathString.split(/[\\\/]/).join('/');
 const relative = (filepath) => `./${replaceSlashes(path.relative(process.cwd(), filepath))}`;
 const matches = a => b => b === a;
@@ -39,9 +42,9 @@ const sc = new SvelteCombine(fs, config);
 const compile = (sc, relativePath) => {
     try {
         sc.combine(relativePath);
-        console.log(color.green(relativePath + ' was saved'));
+        logSuccess(relativePath + ' was saved');
     } catch (error) {
-        console.log(color.red('File could not be saved due to error:', error.message));
+        logError('File could not be saved due to error:', error.message);
     }
 }
 
@@ -49,18 +52,18 @@ const WATCHPATTERNS = 'src/**/*';
 const gaze = new Gaze(WATCHPATTERNS);
 
 gaze.on('ready', watcher => {
-    console.log(color.green(`Compiling: ${WATCHPATTERNS}`));
+    logSuccess(`Compiling: ${WATCHPATTERNS}`);
 
     filterWatched(watcher.relative(), requiredExtensions)
-        .forEach(htmlPath => compile(sc, htmlPath));
+        .forEach(filepath => compile(sc, filepath));
 
     if (isSingleRun) {
         return watcher.close();
     }
-    console.log(color.green(`Watching: ${WATCHPATTERNS}`));
+    logSuccess(`Watching: ${WATCHPATTERNS}`);
 });
 
-gaze.on('error', err => console.log(color.red('Error:', err)));
+gaze.on('error', err => logError('Error:', err));
 
 gaze.on('all', (operation, filepath) => {
     const relativePath = relative(filepath);
