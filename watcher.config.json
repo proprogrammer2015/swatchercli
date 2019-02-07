@@ -1,0 +1,7 @@
+{
+    "isSingleRun": true,
+    "patterns": [
+        "./src/test/**"
+    ],
+    "output": "./dist"
+}

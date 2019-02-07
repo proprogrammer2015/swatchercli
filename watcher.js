@@ -21,13 +21,14 @@ const filterWatched = (files, extList) => {
 exports.watcher = (
     {
         isSingleRun,
-        WATCHPATTERNS,
-        output
+        patterns,
+        output,
+        processors
     }
 ) => {
     const config = {
         output,
-        processors: [
+        processors: processors || [
             new Html(),
             new Js(),
             new Css()
@@ -49,7 +50,7 @@ exports.watcher = (
     }
 
     const onReady = watcher => {
-        logSuccess(`Compiling: ${WATCHPATTERNS}`);
+        logSuccess(`Compiling: ${patterns}`);
 
         filterWatched(watcher.relative(), requiredExtensions)
             .forEach(filepath => compile(sc, filepath));
@@ -57,7 +58,7 @@ exports.watcher = (
         if (isSingleRun) {
             return watcher.close();
         }
-        logSuccess(`Watching: ${WATCHPATTERNS}`);
+        logSuccess(`Watching: ${patterns}`);
     };
 
     const onChanged = (operation, filepath) => {
@@ -73,7 +74,7 @@ exports.watcher = (
     };
 
 
-    const gaze = new Gaze(WATCHPATTERNS);
+    const gaze = new Gaze(patterns);
     gaze.on('ready', onReady);
     gaze.on('error', err => logError('Error:', err));
     gaze.on('all', onChanged);
