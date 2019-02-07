@@ -17,62 +17,64 @@ const filterWatched = (files, extList) => {
         .map(filepath => `./${replaceSlashes(filepath)}`)
         .filter(filepath => extList.some(matches(path.extname(filepath))))
 }
-const [, , ...args] = process.argv;
-const isSingleRun = args.some(matches('--single-run'));
-// TODO:
-// (1) Config file (ie. watcher.json)?
-// (2) some js hook file?
-// (3) cli args?
 
-const processors = [
-    new Html(),
-    new Js(),
-    new Css()
-];
-const requiredExtensions = processors
-    .filter(instance => instance.isRequired())
-    .map(instance => `.${instance.extension()}`);
-
-const config = {
-    output: './output',
-    processors
-};
-const sc = new SvelteCombine(fs, config);
-
-const compile = (sc, relativePath) => {
-    try {
-        sc.combine(relativePath);
-        logSuccess(relativePath + ' was saved');
-    } catch (error) {
-        logError('File could not be saved due to error:', error.message);
+exports.watcher = (
+    {
+        isSingleRun,
+        WATCHPATTERNS,
+        output
     }
+) => {
+    const config = {
+        output,
+        processors: [
+            new Html(),
+            new Js(),
+            new Css()
+        ]
+    }
+    const requiredExtensions = config.processors
+        .filter(type => type.isRequired())
+        .map(type => `.${type.extension()}`);
+
+    const sc = new SvelteCombine(fs, config);
+
+    const compile = (sc, relativePath) => {
+        try {
+            sc.combine(relativePath);
+            logSuccess(relativePath + ' was saved');
+        } catch (error) {
+            logError('File could not be saved due to error:', error.message);
+        }
+    }
+
+    const onReady = watcher => {
+        logSuccess(`Compiling: ${WATCHPATTERNS}`);
+
+        filterWatched(watcher.relative(), requiredExtensions)
+            .forEach(filepath => compile(sc, filepath));
+
+        if (isSingleRun) {
+            return watcher.close();
+        }
+        logSuccess(`Watching: ${WATCHPATTERNS}`);
+    };
+
+    const onChanged = (operation, filepath) => {
+        const relativePath = relative(filepath);
+
+        if (['added', 'changed'].some(matches(operation)) && path.extname(relativePath)) {
+            compile(sc, relativePath);
+        }
+
+        if (['deleted'].some(matches(operation))) {
+            console.log(filepath + ' was deleted');
+        }
+    };
+
+
+    const gaze = new Gaze(WATCHPATTERNS);
+    gaze.on('ready', onReady);
+    gaze.on('error', err => logError('Error:', err));
+    gaze.on('all', onChanged);
 }
-
-const WATCHPATTERNS = 'src/**/*';
-const gaze = new Gaze(WATCHPATTERNS);
-
-gaze.on('ready', watcher => {
-    logSuccess(`Compiling: ${WATCHPATTERNS}`);
-
-    filterWatched(watcher.relative(), requiredExtensions)
-        .forEach(filepath => compile(sc, filepath));
-
-    if (isSingleRun) {
-        return watcher.close();
-    }
-    logSuccess(`Watching: ${WATCHPATTERNS}`);
-});
-
-gaze.on('error', err => logError('Error:', err));
-
-gaze.on('all', (operation, filepath) => {
-    const relativePath = relative(filepath);
-
-    if (['added', 'changed'].some(matches(operation)) && path.extname(relativePath)) {
-        compile(sc, relativePath);
-    }
-
-    if (['deleted'].some(matches(operation))) {
-        console.log(filepath + ' was deleted');
-    }
-});
