@@ -1,10 +1,10 @@
 {
-  "name": "swcli",
+  "name": "swatchercli",
   "version": "1.0.0",
   "description": "",
   "main": "watcherCli.js",
   "bin": {
-    "swcli": "watcherCli.js"
+    "swatchercli": "watcherCli.js"
   },
   "scripts": {
     "watch": "node watcherCli.js -o ./output -p ./src/**",
