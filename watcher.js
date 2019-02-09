@@ -5,47 +5,45 @@ const fs = require('fs');
 const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine/lib/index');
 
 const logSuccess = text => console.log(color.green(text));
-const logError = text => console.log(color.red(text));
+const logError = error => console.log(color.red(`Error: ${error}`));
 
-const replaceSlashes = pathString => pathString.split(/[\\\/]/).join('/');
-const relative = (filepath) => `./${replaceSlashes(path.relative(process.cwd(), filepath))}`;
-const matches = a => b => b === a;
+const replaceSlashes = pathString => `./${pathString.split(/[\\\/]/).join('/')}`;
+const relative = (filepath) => replaceSlashes(path.relative(process.cwd(), filepath));
 const filterWatched = (files, extList) => {
     return Object.keys(files)
-        .map(filepath => files[filepath].filter(path.extname).map(file => `${filepath}${file}`))
-        .reduce((result, paths) => result.concat(paths), [])
-        .map(filepath => `./${replaceSlashes(filepath)}`)
-        .filter(filepath => extList.some(matches(path.extname(filepath))))
-}
+        .map(filepath => files[filepath]
+            .filter(path.extname)
+            .filter(file => extList.some(ext => ext === path.extname(file)))
+            .map(file => replaceSlashes(`${filepath}${file}`))
+        )
+        .reduce((result, paths) => result.concat(paths), []);
+};
+const defaultProcessors = [
+    new Html(),
+    new Js(),
+    new Css()
+];
 
 exports.watcher = (
     {
         isSingleRun,
         patterns,
         output,
-        processors
+        processors = defaultProcessors
     }
 ) => {
-    const config = {
-        output,
-        processors: processors || [
-            new Html(),
-            new Js(),
-            new Css()
-        ]
-    }
-    const requiredExtensions = config.processors
+    const requiredExtensions = processors
         .filter(type => type.isRequired())
         .map(type => `.${type.extension()}`);
 
-    const sc = new SvelteCombine(fs, config);
+    const sc = new SvelteCombine(fs, { output, processors });
 
     const compile = (sc, relativePath) => {
         try {
             sc.combine(relativePath);
-            logSuccess(relativePath + ' was saved');
+            logSuccess(`${relativePath} was saved`);
         } catch (error) {
-            logError('File could not be saved due to error:', error.message);
+            logError(`File could not be saved due to error: ${error.message}`);
         }
     }
 
@@ -61,21 +59,20 @@ exports.watcher = (
         logSuccess(`Watching: ${patterns}`);
     };
 
-    const onChanged = (operation, filepath) => {
-        const relativePath = relative(filepath);
-
-        if (['added', 'changed'].some(matches(operation)) && path.extname(relativePath)) {
+    const onChanged = relativePath => {
+        if (path.extname(relativePath)) {
             compile(sc, relativePath);
-        }
-
-        if (['deleted'].some(matches(operation))) {
-            console.log(filepath + ' was deleted');
         }
     };
 
+    const onDeleted = relativePath => console.log(`${relativePath} was deleted`);
+
+    const onRelative = callback => filepath => callback(relative(filepath));
 
     const gaze = new Gaze(patterns);
     gaze.on('ready', onReady);
-    gaze.on('error', err => logError('Error:', err));
-    gaze.on('all', onChanged);
+    gaze.on('error', logError);
+    gaze.on('added', onRelative(onChanged));
+    gaze.on('changed', onRelative(onChanged));
+    gaze.on('deleted', onRelative(onDeleted));
 }
