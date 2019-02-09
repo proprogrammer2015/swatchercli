@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 const { watcher } = require('./watcher');
-const color = require('colors');
 const argv = require('yargs')
     .usage(`Usage: $0 <command> [options]`)
     .command('-p ./src/** -o ./dist', 'Watches ./src/** and outputs to ./dist')
@@ -41,8 +40,7 @@ const argv = require('yargs')
         describe: 'Path to JSON configuration file'
     })
     .option('h', {
-        alias: 'help',
-        default: true
+        alias: 'help'
     })
     .help('h')
     .argv;
