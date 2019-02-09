@@ -45,7 +45,6 @@ const argv = require('yargs')
         default: true
     })
     .help('h')
-    .epilog('copyright 2019')
     .argv;
 
 watcher(argv);
