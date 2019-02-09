@@ -1,30 +1,30 @@
-# swcli
+# swatchercli
 
 ## Instalation
 ```sh
-npm install swcli
+npm install swatchercli
 ```
 
 ## Run command
 ### Help
 ```sh
-swcli --help
+swatchercli --help
 ```
 ### Single run
 ```sh
-swcli -s -o ./output -p ./src/**
+swatchercli -s -o ./output -p ./src/**
 ```
 ### Continuous run
 ```sh
-swcli -o ./output -p ./src/**
+swatchercli -o ./output -p ./src/**
 ```
 ### Using json configutaion
 ```sh
-swcli -j ./path/to/watcher.config.json
+swatchercli -j ./path/to/watcher.config.json
 ```
 ### Using js configutaion
 ```sh
-swcli -c ./path/to/watcher.config.js
+swatchercli -c ./path/to/watcher.config.js
 ```
 
 ## Configuration
