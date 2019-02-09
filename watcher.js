@@ -66,7 +66,6 @@ exports.watcher = (
     };
 
     const onDeleted = relativePath => console.log(`${relativePath} was deleted`);
-
     const onRelative = callback => filepath => callback(relative(filepath));
 
     const gaze = new Gaze(patterns);
