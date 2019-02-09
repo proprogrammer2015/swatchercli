@@ -21,8 +21,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chokidar": "^2.1.0",
     "colors": "^1.3.3",
+    "corresponding-path": "https://github.com/proprogrammer2015/corresponding-path.git",
     "gaze": "^1.1.3",
+    "rimraf": "^2.6.3",
     "svelte-module-combine": "git+https://github.com/proprogrammer2015/svelte-module-combine.git",
     "yargs": "^12.0.5"
   },

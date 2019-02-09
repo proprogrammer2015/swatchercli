@@ -1,22 +1,23 @@
-const Gaze = require('gaze').Gaze;
+const chokidar = require('chokidar');
 const color = require('colors');
 const path = require('path');
 const fs = require('fs');
+const rimraf = require('rimraf');
 const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine/lib/index');
+const { resolvePath } = require('corresponding-path/lib/path');
 
 const logSuccess = text => console.log(color.green(text));
 const logError = error => console.log(color.red(`Error: ${error}`));
 
 const replaceSlashes = pathString => `./${pathString.split(/[\\\/]/).join('/')}`;
-const relative = (filepath) => replaceSlashes(path.relative(process.cwd(), filepath));
-const filterWatched = (files, extList) => {
+const matchSome = extList => filepath => extList.some(ext => ext === path.extname(filepath));
+const relativePaths = (files) => {
     return Object.keys(files)
         .map(filepath => files[filepath]
             .filter(path.extname)
-            .filter(file => extList.some(ext => ext === path.extname(file)))
-            .map(file => replaceSlashes(`${filepath}${file}`))
+            .map(file => replaceSlashes(`${filepath}/${file}`))
         )
-        .reduce((result, paths) => result.concat(paths), []);
+        .reduce((result, paths) => result.concat(paths), [])
 };
 const defaultProcessors = [
     new Html(),
@@ -43,35 +44,38 @@ exports.watcher = (
             sc.combine(relativePath);
             logSuccess(`${relativePath} was saved`);
         } catch (error) {
-            logError(`File could not be saved due to error: ${error.message}`);
+            logError(`File ${relativePath} could not be saved due to error: ${error.message}`);
         }
     }
 
-    const onReady = watcher => {
-        logSuccess(`Compiling: ${patterns}`);
+    const onChanged = relativePath => compile(sc, relativePath)
 
-        filterWatched(watcher.relative(), requiredExtensions)
-            .forEach(filepath => compile(sc, filepath));
-
-        if (isSingleRun) {
-            return watcher.close();
-        }
-        logSuccess(`Watching: ${patterns}`);
+    const onDeleted = relativePath => {
+        const { dir } = resolvePath(relativePath, output);
+        const toBeRemoed = dir.join('/');
+        rimraf.sync(toBeRemoed);
+        console.log(`${toBeRemoed} was deleted`);
     };
+    const onRelative = callback => filepath => callback(replaceSlashes(filepath));
 
-    const onChanged = relativePath => {
-        if (path.extname(relativePath)) {
-            compile(sc, relativePath);
-        }
-    };
+    const watcher = chokidar.watch(patterns, { persistent: !isSingleRun, cwd: process.cwd() });
+    watcher
+        .on('add', path => {
+            const newRelativePath = replaceSlashes(path);
+            const isNew = relativePaths(watcher.getWatched())
+                .filter(relativePath => relativePath !== newRelativePath)
+                .some(isNew => !!isNew);
 
-    const onDeleted = relativePath => console.log(`${relativePath} was deleted`);
-    const onRelative = callback => filepath => callback(relative(filepath));
-
-    const gaze = new Gaze(patterns);
-    gaze.on('ready', onReady);
-    gaze.on('error', logError);
-    gaze.on('added', onRelative(onChanged));
-    gaze.on('changed', onRelative(onChanged));
-    gaze.on('deleted', onRelative(onDeleted));
+            if (isNew) {
+                onChanged(newRelativePath);
+            }
+        })
+        .on('change', onRelative(onChanged))
+        .on('unlink', onRelative(onDeleted))
+        .on('unlinkDir', onRelative(onDeleted))
+        .on('error', logError)
+        .on('ready', () => relativePaths(watcher.getWatched())
+            .filter(matchSome(requiredExtensions))
+            .forEach(filepath => compile(sc, filepath))
+        );
 }
