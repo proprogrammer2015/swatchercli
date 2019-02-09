@@ -40,8 +40,11 @@ const argv = require('yargs')
         config: true,
         describe: 'Path to JSON configuration file'
     })
+    .option('h', {
+        alias: 'help',
+        default: true
+    })
     .help('h')
-    .alias('h', 'help')
     .epilog('copyright 2019')
     .argv;
 
