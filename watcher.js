@@ -3,8 +3,8 @@ const color = require('colors');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine/lib/index');
-const { resolvePath } = require('corresponding-path/lib/path');
+const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine');
+const { resolvePath } = require('corresponding-path');
 
 const logSuccess = text => console.log(color.green(text));
 const logError = error => console.log(color.red(`Error: ${error}`));

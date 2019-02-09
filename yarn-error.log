@@ -39,10 +39,10 @@ npm manifest:
     "dependencies": {
       "chokidar": "^2.1.0",
       "colors": "^1.3.3",
-      "corresponding-path": "1.0.0",
+      "corresponding-path": "^1.0.0",
       "gaze": "^1.1.3",
       "rimraf": "^2.6.3",
-      "svelte-module-combine": "git+https://github.com/proprogrammer2015/svelte-module-combine.git",
+      "svelte-module-combine": "^1.0.0",
       "yargs": "^12.0.5"
     },
     "devDependencies": {
@@ -369,9 +369,9 @@ Lockfile:
     version "1.0.2"
     resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   
-  "corresponding-path@https://github.com/proprogrammer2015/corresponding-path.git":
+  corresponding-path@1.0.0, corresponding-path@^1.0.0:
     version "1.0.0"
-    resolved "https://github.com/proprogrammer2015/corresponding-path.git#490e3591d817bb48951e10d1ab70feaefdbf9a6c"
+    resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.0.tgz#ef2c6e515967e811dbe812dd72ff1efe7fff490a"
   
   cross-spawn@^6.0.0:
     version "6.0.5"
@@ -1762,9 +1762,11 @@ Lockfile:
     dependencies:
       has-flag "^3.0.0"
   
-  "svelte-module-combine@git+https://github.com/proprogrammer2015/svelte-module-combine.git":
+  svelte-module-combine@1.0.0:
     version "1.0.0"
-    resolved "git+https://github.com/proprogrammer2015/svelte-module-combine.git#d4c6f0eee0347a09a30b4c800be3e60e27045a46"
+    resolved "https://registry.yarnpkg.com/svelte-module-combine/-/svelte-module-combine-1.0.0.tgz#543900c26292ac799f085178aeec42378c04c0ee"
+    dependencies:
+      corresponding-path "^1.0.0"
   
   tar@^4:
     version "4.4.8"
