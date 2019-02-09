@@ -12,24 +12,34 @@ const argv = require('yargs')
     .example('$0 -s -o ./dist -p ./src/**', 'Runs script once that takes all ./src files and creates output in ./dist')
     .example('$0 -c watcher.config.js', 'Imports configuration file.')
     .example('$0 -j watcher.config.json', 'Imports json configuration file.')
-    .alias('s', 'isSingleRun')
-    .alias('o', 'output')
-    .alias('p', 'patterns')
-    .alias('c', 'config')
-    .alias('j', 'json')
-    .array('p')
-    .describe('s', 'Run script once')
-    .describe('p', 'List of file patterns to match')
-    .describe('o', 'Output path')
-    .describe('c', 'Configuration file path')
-    .describe('j', 'Configuration json file path')
-    // .demandCommand(1, color.red('Please specify any option'))
-    .config('c', function (configPath) {
-        return require(configPath);
+    .option('s', {
+        alias: 'isSingleRun',
+        type: 'boolean',
+        describe: 'Run script once'
     })
-    .config('j')
-    // .conflicts('o', 'c')
-    // .conflicts('p', 'c')
+    .option('o', {
+        alias: 'output',
+        type: 'string',
+        describe: 'Output path'
+    })
+    .option('p', {
+        alias: 'patterns',
+        type: 'array',
+        describe: 'List of file patterns to match'
+    })
+    .option('c', {
+        alias: 'config',
+        type: 'string',
+        config: true,
+        describe: 'Path to js configuration file',
+        configParser: configPath => require(configPath)
+    })
+    .option('j', {
+        alias: 'json',
+        type: 'string',
+        config: true,
+        describe: 'Path to JSON configuration file'
+    })
     .help('h')
     .alias('h', 'help')
     .epilog('copyright 2019')
