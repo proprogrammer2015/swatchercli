@@ -52,9 +52,9 @@ exports.watcher = (
 
     const onDeleted = relativePath => {
         const { dir } = resolvePath(relativePath, output);
-        const toBeRemoed = dir.join('/');
-        rimraf.sync(toBeRemoed);
-        console.log(`${toBeRemoed} was deleted`);
+        const toBeRemoved = dir.join('/');
+        rimraf.sync(toBeRemoved);
+        console.log(`${toBeRemoved} was deleted`);
     };
     const onRelative = callback => filepath => callback(replaceSlashes(filepath));
 
