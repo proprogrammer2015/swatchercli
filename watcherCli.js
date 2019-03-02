@@ -21,6 +21,11 @@ const argv = require('yargs')
         type: 'string',
         describe: 'Output path'
     })
+    .option('outExt', {
+        alias: 'outputExtension',
+        type: 'string',
+        describe: 'Output extension'
+    })
     .option('p', {
         alias: 'patterns',
         type: 'array',

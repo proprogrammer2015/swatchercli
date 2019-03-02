@@ -6,6 +6,7 @@ exports.patterns = [
     './src/**'
 ];
 exports.output = './output';
+exports.outputExtension = 'html';
 exports.processors = [
     new Html(),
     new Js(),

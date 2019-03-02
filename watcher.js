@@ -42,6 +42,7 @@ exports.watcher = (
         isSingleRun,
         patterns,
         output,
+        outputExtension,
         processors = defaultProcessors,
         entrypoints = {}
     }
@@ -49,7 +50,7 @@ exports.watcher = (
     const onEvent = { ...entrypointsDefault, ...entrypoints };
     const requiredExtensions = mapRequiredProcessors(processors);
 
-    const sc = new SvelteCombine(fs, { output, processors });
+    const sc = new SvelteCombine(fs, { output, outputExtension, processors });
     const compile = relativePath => {
         try {
             sc.combine(relativePath);
