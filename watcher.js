@@ -7,7 +7,8 @@ const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine');
 const { resolvePath } = require('corresponding-path');
 
 const replaceSlashes = pathString => `./${pathString.split(/[\\\/]/).join('/')}`;
-const matchSome = extList => filepath => extList.some(ext => ext === path.extname(filepath));
+const pathMatches = list => filepath => list.some(ext => ext === path.extname(filepath));
+const pathContains = pattern => path => path.indexOf(pattern) !== -1
 const relativePaths = (files) => {
     return Object.keys(files)
         .map(filepath => files[filepath]
@@ -58,27 +59,26 @@ exports.watcher = (
         }
     };
 
-    const onDeleted = relativePath => {
-        const { dir, modulePath, name, ext } = resolvePath(relativePath, output);
-        const toBeRemoved = `${dir.join('/')}/${name}${ext}`;
-        rimraf.sync(toBeRemoved);
-        logSuccess(`${toBeRemoved} was deleted`);
+    const remove = filepath => {
+        rimraf.sync(filepath);
+        logSuccess(`${filepath} was deleted`);
+    };
 
+    const onDeleted = relativePath => {
+        const { dirStr, modulePath, name, ext } = resolvePath(relativePath, output);
+        remove(`${dirStr}/${name}${ext}`);
         // Recompile if part of the module was removed
+        compileAllIf(pathContains(`${modulePath}/${name}`));
+    };
+
+    const compileAllIf = condition => {
         relativePaths(watcher.getWatched())
-            .filter(path => path.indexOf(`${modulePath}/${name}`) !== -1)
+            .filter(condition)
             .forEach(compile);
     };
+
     const onRelative = callback => filepath => callback(replaceSlashes(filepath));
-
-    const onAdd = newRelativePath => {
-        const isNew = relativePaths(watcher.getWatched())
-            .some(relativePath => relativePath !== newRelativePath);
-
-        if (isNew) {
-            compile(newRelativePath);
-        }
-    };
+    
     const watcher = chokidar.watch(patterns, { persistent: !isSingleRun, cwd: process.cwd() });
     watcher
         .on('change', onRelative(compile))
@@ -86,10 +86,7 @@ exports.watcher = (
         .on('unlinkDir', onRelative(onDeleted))
         .on('error', logError)
         .on('ready', () => {
-            relativePaths(watcher.getWatched())
-                .filter(matchSome(requiredExtensions))
-                .forEach(compile);
-
-            watcher.on('add', onRelative(onAdd));
+            compileAllIf(pathMatches(requiredExtensions));
+            watcher.on('add', onRelative(compile));
         });
 }
