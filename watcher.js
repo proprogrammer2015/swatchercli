@@ -29,6 +29,7 @@ const mapRequiredProcessors = processors => processors
 const noop = () => { };
 const entrypointsDefault = {
     ready: noop,
+    error: noop,
     change: noop,
     unlink: noop,
     unlinkDir: this.unlink,
@@ -42,13 +43,10 @@ exports.watcher = (
         patterns,
         output,
         processors = defaultProcessors,
-        entrypoints
+        entrypoints = {}
     }
 ) => {
-    const onEvent = {
-        ...entrypointsDefault,
-        ...entrypoints
-    };
+    const onEvent = { ...entrypointsDefault, ...entrypoints };
     const requiredExtensions = mapRequiredProcessors(processors);
 
     const sc = new SvelteCombine(fs, { output, processors });

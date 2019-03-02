@@ -12,7 +12,7 @@ exports.processors = [
     new Css()
 ];
 exports.entrypoints = {
-    unlink: path => console.log(color.grey(`${path} was removed.`)),
+    delete: path => console.log(color.grey(`${path} was removed.`)),
     error: msg => console.log(color.red(`ERROR: ${msg}`)),
     compile: (path, all) => console.log(color.green(`${path} was compiled.`)),
     change: (path, all) => console.log(color.yellow(`${path} was changed.`)),
