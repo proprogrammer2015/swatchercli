@@ -42,9 +42,10 @@ exports.watcher = (
         }
     };
 
-    const requiredExtensions = processors
-        .filter(type => type.isRequired())
-        .map(type => `.${type.extension()}`);
+    // const requiredExtensions = processors
+    //     .filter(type => type.isRequired())
+    //     .map(type => `.${type.extension()}`);
+    const requiredExtensions = ['.html'];
 
     const sc = new SvelteCombine(fs, { output, processors });
 
@@ -55,7 +56,7 @@ exports.watcher = (
         } catch (error) {
             logError(`File ${relativePath} could not be saved due to error: ${error.message}`);
         }
-    }
+    };
 
     const onChanged = relativePath => compile(sc, relativePath)
 
@@ -77,22 +78,24 @@ exports.watcher = (
 
     const watcher = chokidar.watch(patterns, { persistent: !isSingleRun, cwd: process.cwd() });
     watcher
-        .on('add', path => {
-            const newRelativePath = replaceSlashes(path);
-            const isNew = relativePaths(watcher.getWatched())
-                .filter(relativePath => relativePath !== newRelativePath)
-                .some(isNew => !!isNew);
-
-            if (isNew) {
-                onChanged(newRelativePath);
-            }
-        })
         .on('change', onRelative(onChanged))
         .on('unlink', onRelative(onDeleted))
         .on('unlinkDir', onRelative(onDeleted))
         .on('error', logError)
-        .on('ready', () => relativePaths(watcher.getWatched())
-            .filter(matchSome(requiredExtensions))
-            .forEach(filepath => compile(sc, filepath))
-        );
+        .on('ready', () => {
+            relativePaths(watcher.getWatched())
+                .filter(matchSome(requiredExtensions))
+                .forEach(filepath => compile(sc, filepath))
+
+            watcher.on('add', path => {
+                const newRelativePath = replaceSlashes(path);
+                const isNew = relativePaths(watcher.getWatched())
+                    .filter(relativePath => relativePath !== newRelativePath)
+                    .some(isNew => !!isNew);
+
+                if (isNew) {
+                    onChanged(newRelativePath);
+                }
+            })
+        });
 }

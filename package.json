@@ -8,6 +8,7 @@
   },
   "scripts": {
     "watch": "node watcherCli.js -o ./output -p ./src/**",
+    "watch:debug": "node watcherCli.js -d -o ./output -p ./src/**",
     "once": "node watcherCli.js -s -o ./output -p ./src/**",
     "debug": "node watcherCli.js -d -s -o ./output -p ./src/**"
   },
