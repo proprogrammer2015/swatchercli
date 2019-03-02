@@ -1,6 +1,6 @@
 {
   "name": "swatchercli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "watcherCli.js",
   "bin": {
@@ -8,9 +8,8 @@
   },
   "scripts": {
     "watch": "node watcherCli.js -o ./output -p ./src/**",
-    "watch:debug": "node watcherCli.js -d -o ./output -p ./src/**",
     "once": "node watcherCli.js -s -o ./output -p ./src/**",
-    "debug": "node watcherCli.js -d -s -o ./output -p ./src/**"
+    "config": "node watcherCli.js -c watcher.config.js"
   },
   "keywords": [
     "svelte",

@@ -1,5 +1,4 @@
 const chokidar = require('chokidar');
-const color = require('colors');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -27,66 +26,62 @@ const mapRequiredProcessors = processors => processors
     .filter(type => type.isRequired())
     .map(type => `.${type.extension()}`);
 
+const noop = () => { };
+const entrypointsDefault = {
+    ready: noop,
+    change: noop,
+    unlink: noop,
+    unlinkDir: this.unlink,
+    add: noop,
+    compile: noop
+};
+
 exports.watcher = (
     {
         isSingleRun,
         patterns,
         output,
-        debug,
-        processors = defaultProcessors
+        processors = defaultProcessors,
+        entrypoints
     }
 ) => {
-    const logSuccess = text => {
-        if (debug) {
-            console.log(color.green(text));
-        }
+    const onEvent = {
+        ...entrypointsDefault,
+        ...entrypoints
     };
-    const logError = error => {
-        if (debug) {
-            console.log(color.red(`Error: ${error}`));
-        }
-    };
-
     const requiredExtensions = mapRequiredProcessors(processors);
 
     const sc = new SvelteCombine(fs, { output, processors });
     const compile = relativePath => {
         try {
             sc.combine(relativePath);
-            logSuccess(`${relativePath} was saved`);
+            onEvent.compile(relativePath);
         } catch (error) {
-            logError(`File ${relativePath} could not be saved due to error: ${error.message}`);
+            onEvent.error(`File ${relativePath} could not be saved due to error: ${error.message}`);
         }
     };
 
-    const remove = filepath => {
-        rimraf.sync(filepath);
-        logSuccess(`${filepath} was deleted`);
-    };
-
-    const onDeleted = relativePath => {
+    const onDeleted = (relativePath, relativeWatched) => {
         const { dirStr, modulePath, name, ext } = resolvePath(relativePath, output);
-        remove(`${dirStr}/${name}${ext}`);
+        rimraf.sync(`${dirStr}/${name}${ext}`);
         // Recompile if part of the module was removed
-        compileAllIf(pathContains(`${modulePath}/${name}`));
+        relativeWatched.filter(pathContains(`${modulePath}/${name}`)).forEach(compile);
     };
 
-    const compileAllIf = condition => {
-        relativePaths(watcher.getWatched())
-            .filter(condition)
-            .forEach(compile);
-    };
+    const on = (watcher, eventType, callback) => watcher.on(eventType, (relativePath) => {
+        const path = relativePath ? replaceSlashes(relativePath) : null;
+        const watched = relativePaths(watcher.getWatched());
 
-    const onRelative = callback => filepath => callback(replaceSlashes(filepath));
-    
+        onEvent[eventType](path, watched);
+        callback(path, watched);
+    });
     const watcher = chokidar.watch(patterns, { persistent: !isSingleRun, cwd: process.cwd() });
-    watcher
-        .on('change', onRelative(compile))
-        .on('unlink', onRelative(onDeleted))
-        .on('unlinkDir', onRelative(onDeleted))
-        .on('error', logError)
-        .on('ready', () => {
-            compileAllIf(pathMatches(requiredExtensions));
-            watcher.on('add', onRelative(compile));
-        });
+    watcher.on('error', onEvent.error);
+    on(watcher, 'unlink', onDeleted);
+    on(watcher, 'unlinkDir', onDeleted);
+    on(watcher, 'change', compile);
+    on(watcher, 'ready', (_, relativeWatched) => {
+        relativeWatched.filter(pathMatches(requiredExtensions)).forEach(compile);
+        on(watcher, 'add', compile);
+    });
 }

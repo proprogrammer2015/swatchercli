@@ -21,11 +21,6 @@ const argv = require('yargs')
         type: 'string',
         describe: 'Output path'
     })
-    .option('d', {
-        alias: 'debug',
-        type: 'boolean',
-        describe: 'Output console log'
-    })
     .option('p', {
         alias: 'patterns',
         type: 'array',
