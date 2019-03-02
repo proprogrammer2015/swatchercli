@@ -6,9 +6,6 @@ const rimraf = require('rimraf');
 const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine');
 const { resolvePath } = require('corresponding-path');
 
-const logSuccess = text => console.log(color.green(text));
-const logError = error => console.log(color.red(`Error: ${error}`));
-
 const replaceSlashes = pathString => `./${pathString.split(/[\\\/]/).join('/')}`;
 const matchSome = extList => filepath => extList.some(ext => ext === path.extname(filepath));
 const relativePaths = (files) => {
@@ -30,9 +27,21 @@ exports.watcher = (
         isSingleRun,
         patterns,
         output,
+        debug,
         processors = defaultProcessors
     }
 ) => {
+    const logSuccess = text => {
+        if (debug) {
+            console.log(color.green(text));
+        }
+    };
+    const logError = error => {
+        if (debug) {
+            console.log(color.red(`Error: ${error}`));
+        }
+    };
+
     const requiredExtensions = processors
         .filter(type => type.isRequired())
         .map(type => `.${type.extension()}`);
@@ -51,10 +60,18 @@ exports.watcher = (
     const onChanged = relativePath => compile(sc, relativePath)
 
     const onDeleted = relativePath => {
-        const { dir } = resolvePath(relativePath, output);
-        const toBeRemoved = dir.join('/');
+        const { dir, modulePath, name, ext } = resolvePath(relativePath, output);
+        const toBeRemoved = `${dir.join('/')}/${name}${ext}`;
         rimraf.sync(toBeRemoved);
-        console.log(`${toBeRemoved} was deleted`);
+        logSuccess(`${toBeRemoved} was deleted`);
+
+        const moduleLeftoverPaths = relativePaths(watcher.getWatched())
+            .filter(p => p.indexOf(`${modulePath}/${name}`) !== -1);
+
+        if (moduleLeftoverPaths.length) {
+            // Recompile if part of the module was removed
+            moduleLeftoverPaths.forEach(relativePath => compile(sc, relativePath));
+        }
     };
     const onRelative = callback => filepath => callback(replaceSlashes(filepath));
 
