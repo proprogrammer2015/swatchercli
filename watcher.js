@@ -27,14 +27,16 @@ const mapRequiredProcessors = processors => processors
     .map(type => `.${type.extension()}`);
 
 const noop = () => { };
-const entrypointsDefault = {
-    ready: noop,
-    error: noop,
-    change: noop,
-    unlink: noop,
-    unlinkDir: this.unlink,
-    add: noop,
-    compile: noop
+const entrypointsDefault = (entrypoints = {}) => {
+    return {
+        ready: entrypoints.ready || noop,
+        error: entrypoints.error || noop,
+        change: entrypoints.change || noop,
+        unlink: entrypoints.delete || noop,
+        unlinkDir: entrypoints.delete || noop,
+        add: entrypoints.add || noop,
+        compile: entrypoints.compile || noop
+    };
 };
 
 exports.watcher = (
@@ -44,10 +46,11 @@ exports.watcher = (
         output,
         outputExtension,
         processors = defaultProcessors,
-        entrypoints = {}
+        entrypoints
     }
 ) => {
-    const onEvent = { ...entrypointsDefault, ...entrypoints };
+    // TODO: Removing folder with html file throws an error and does not remove ./output ;(
+    const onEvent = entrypointsDefault(entrypoints);
     const requiredExtensions = mapRequiredProcessors(processors);
 
     const sc = new SvelteCombine(fs, { output, outputExtension, processors });
