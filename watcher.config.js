@@ -1,7 +1,7 @@
 const color = require('colors');
 const { Html, Js, Css } = require('svelte-module-combine/lib/index');
 
-exports.isSingleRun = false;
+exports.watch = false;
 exports.patterns = [
     './src/**'
 ];

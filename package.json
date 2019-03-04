@@ -7,8 +7,8 @@
     "swatchercli": "watcherCli.js"
   },
   "scripts": {
-    "watch": "node watcherCli.js -o ./output -outExt html -p ./src/**",
-    "once": "node watcherCli.js -s -o ./output  -outExt html -p ./src/**",
+    "watch": "node watcherCli.js -w -o ./output -outExt html -p ./src/**",
+    "once": "node watcherCli.js -o ./output -outExt html -p ./src/**",
     "config": "node watcherCli.js -c watcher.config.js"
   },
   "keywords": [

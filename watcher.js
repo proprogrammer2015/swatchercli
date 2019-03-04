@@ -41,7 +41,7 @@ const entrypointsDefault = (entrypoints = {}) => {
 
 exports.watcher = (
     {
-        isSingleRun,
+        watch,
         patterns,
         output,
         outputExtension,
@@ -78,7 +78,7 @@ exports.watcher = (
         onEvent[eventType](path, watched);
         callback(path, watched);
     });
-    const watcher = chokidar.watch(patterns, { persistent: !isSingleRun, cwd: process.cwd() });
+    const watcher = chokidar.watch(patterns, { persistent: watch, cwd: process.cwd() });
     watcher.on('error', onEvent.error);
     on(watcher, 'unlink', onDeleted);
     on(watcher, 'unlinkDir', onDeleted);
