@@ -46,14 +46,15 @@ exports.watcher = (
         output,
         outputExtension,
         processors = defaultProcessors,
-        entrypoints
+        entrypoints,
+        filename
     }
 ) => {
     // TODO: Removing folder with html file throws an error and does not remove ./output ;(
     const onEvent = entrypointsDefault(entrypoints);
     const requiredExtensions = mapRequiredProcessors(processors);
 
-    const sc = new SvelteCombine(fs, { output, outputExtension, processors });
+    const sc = new SvelteCombine(fs, { output, outputExtension, processors, filename });
     const compile = relativePath => {
         try {
             sc.combine(relativePath);

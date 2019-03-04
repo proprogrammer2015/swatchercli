@@ -7,6 +7,7 @@ exports.patterns = [
 ];
 exports.output = './output';
 exports.outputExtension = 'html';
+exports.filename = 'changed-[name]-of-this-file';
 exports.processors = [
     new Html(),
     new Js(),

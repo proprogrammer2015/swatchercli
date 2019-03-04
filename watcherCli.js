@@ -16,6 +16,11 @@ const argv = require('yargs')
         type: 'boolean',
         describe: 'Run script once'
     })
+    .option('name', {
+        alias: 'filename',
+        type: 'string',
+        describe: 'Modifies output file name'
+    })
     .option('o', {
         alias: 'output',
         type: 'string',
