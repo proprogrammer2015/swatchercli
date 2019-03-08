@@ -50,7 +50,6 @@ exports.watcher = (
         filename
     }
 ) => {
-    // TODO: Removing folder with html file throws an error and does not remove ./output ;(
     const onEvent = entrypointsDefault(entrypoints);
     const requiredExtensions = mapRequiredProcessors(processors);
 

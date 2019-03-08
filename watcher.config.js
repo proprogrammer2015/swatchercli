@@ -3,11 +3,12 @@ const { Html, Js, Css } = require('svelte-module-combine/lib/index');
 
 exports.watch = false;
 exports.patterns = [
-    './src/**'
+    './src/components/**',
+    '!./src/components/**/*.svelte'
 ];
 exports.output = './output';
-exports.outputExtension = 'html';
-exports.filename = 'changed-[name]-of-this-file';
+exports.outputExtension = 'svelte';
+exports.filename = 'compilec-[name]';
 exports.processors = [
     new Html(),
     new Js(),

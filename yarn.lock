@@ -198,6 +198,10 @@ corresponding-path@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.0.tgz#ef2c6e515967e811dbe812dd72ff1efe7fff490a"
 
+corresponding-path@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.2.tgz#41ad96fc34109e6472cc30392da4012cd088368b"
+
 cross-spawn@^6.0.0:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-6.0.5.tgz#4a5ec7c64dfae22c3a14124dbacdee846d80cbc4"
@@ -1152,11 +1156,11 @@ strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
-svelte-module-combine@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/svelte-module-combine/-/svelte-module-combine-1.0.2.tgz#7d868a91bfc83ab5c300f9ffcc6acdada0cf7ced"
+svelte-module-combine@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/svelte-module-combine/-/svelte-module-combine-1.0.3.tgz#bb3268661967eb0eebea30ab966205f32238307b"
   dependencies:
-    corresponding-path "^1.0.0"
+    corresponding-path "^1.0.2"
     dummy-node-fs "^1.0.1"
 
 tar@^4:
