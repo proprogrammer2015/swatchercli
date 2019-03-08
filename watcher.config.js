@@ -8,7 +8,7 @@ exports.patterns = [
 ];
 exports.output = './output';
 exports.outputExtension = 'svelte';
-exports.filename = 'compilec-[name]';
+exports.filename = 'compiled-[name]';
 exports.processors = [
     new Html(),
     new Js(),
