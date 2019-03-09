@@ -6,8 +6,8 @@ exports.patterns = [
     './src/components/**',
     '!./src/components/**/*.svelte'
 ];
-exports.output = './output';
-exports.fileName = '.html';
+exports.output = './src';
+exports.fileName = '.svelte';
 exports.processors = [
     new Html(),
     new Js(),
@@ -15,6 +15,5 @@ exports.processors = [
 ];
 
 // TODO: should override output
-exports.entrypoints = {
-    ready: () => {}
+exports.hooks = {
 }

@@ -1,1 +1,3 @@
-///asdf
+function init() {
+    return 'init';
+}
