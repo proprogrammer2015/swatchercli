@@ -30,8 +30,8 @@ const mapRequiredProcessors = processors => processors
 const defaultOutput = {
     delete: path => console.log(color.grey(`${path} was removed.`)),
     error: msg => console.log(color.red(`ERROR: ${msg}`)),
-    compile: (inputPath, outputPath) => console.log(color.green(`${inputPath} was compiled to ${outputPath}`)),
-    change: (path) => console.log(color.yellow(`${path} was changed.`)),
+    compile: (path) => console.log(color.green(`${path} was compiled.`)),
+    change: (path) => console.log(color.green(`${path} was changed.`)),
     add: (path) => console.log(color.blue(`${path} was added.`)),
     ready: () => console.table(color.inverse(`[any-file-merge]`))
 };
@@ -73,11 +73,9 @@ exports.watcher = (
 
     const onDeleted = (relativePath, relativeWatched) => {
         const path = resolvePath(relativePath, output);
-        const { modulePath, name, ext } = path.input;
-        const { dir } = path.output;
-        rimraf.sync(`${dir.join('/')}/${name}${ext}`);
+        rimraf.sync(path.output.full);
         // Recompile if part of the module was removed
-        relativeWatched.filter(pathContains(`${modulePath}/${name}`)).forEach(compile);
+        relativeWatched.filter(pathContains(`${path.input.modulePath}`)).forEach(compile);
     };
 
     const on = (watcher, eventType, callback) => watcher.on(eventType, (relativePath) => {

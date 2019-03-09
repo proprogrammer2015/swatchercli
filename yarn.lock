@@ -209,6 +209,10 @@ corresponding-path@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.5.tgz#6d61f609c4da2347201323c00374441addddac83"
 
+corresponding-path@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.6.tgz#25ccce37fd526e09be879916e44ebb34be25c317"
+
 cross-spawn@^6.0.0:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-6.0.5.tgz#4a5ec7c64dfae22c3a14124dbacdee846d80cbc4"
