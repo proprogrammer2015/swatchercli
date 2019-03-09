@@ -14,6 +14,13 @@ ansi-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-3.0.0.tgz#ed0317c322064f79466c02966bddb605ab37d998"
 
+any-file-merge@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/any-file-merge/-/any-file-merge-1.0.1.tgz#564a0858f4c1373908432e2cb6d49a59ba4fa891"
+  dependencies:
+    corresponding-path "^1.0.5"
+    dummy-node-fs "^1.0.1"
+
 anymatch@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/anymatch/-/anymatch-2.0.0.tgz#bcb24b4f37934d9aa7ac17b4adaf89e7c76ef2eb"
@@ -198,9 +205,9 @@ corresponding-path@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.0.tgz#ef2c6e515967e811dbe812dd72ff1efe7fff490a"
 
-corresponding-path@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.2.tgz#41ad96fc34109e6472cc30392da4012cd088368b"
+corresponding-path@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/corresponding-path/-/corresponding-path-1.0.5.tgz#6d61f609c4da2347201323c00374441addddac83"
 
 cross-spawn@^6.0.0:
   version "6.0.5"
@@ -1155,13 +1162,6 @@ strip-eof@^1.0.0:
 strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
-
-svelte-module-combine@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/svelte-module-combine/-/svelte-module-combine-1.0.3.tgz#bb3268661967eb0eebea30ab966205f32238307b"
-  dependencies:
-    corresponding-path "^1.0.2"
-    dummy-node-fs "^1.0.1"
 
 tar@^4:
   version "4.4.8"

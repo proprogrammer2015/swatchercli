@@ -8,7 +8,7 @@
   },
   "scripts": {
     "watch": "node watcherCli.js -w -o ./output -outExt html -p ./src/**",
-    "once": "node watcherCli.js -o ./output -outExt html -p ./src/**",
+    "once": "node watcherCli.js -o ./output -n .svelte2 -p ./src/**",
     "config": "node watcherCli.js -c watcher.config.js"
   },
   "keywords": [
@@ -22,9 +22,9 @@
   "dependencies": {
     "chokidar": "^2.1.0",
     "colors": "^1.3.3",
-    "corresponding-path": "^1.0.2",
+    "corresponding-path": "^1.0.5",
     "rimraf": "^2.6.3",
-    "svelte-module-combine": "^1.0.3",
+    "any-file-merge": "^1.0.1",
     "yargs": "^12.0.5"
   }
 }

@@ -1,8 +1,9 @@
 const chokidar = require('chokidar');
 const path = require('path');
+const color = require('colors');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const { SvelteCombine, Html, Js, Css } = require('svelte-module-combine');
+const { AnyFileMerge, Html, Js, Css } = require('any-file-merge');
 const { resolvePath } = require('corresponding-path');
 
 const replaceSlashes = pathString => `./${pathString.split(/[\\\/]/).join('/')}`;
@@ -26,16 +27,23 @@ const mapRequiredProcessors = processors => processors
     .filter(type => type.isRequired())
     .map(type => `.${type.extension()}`);
 
-const noop = () => { };
+const defaultOutput = {
+    delete: path => console.log(color.grey(`${path} was removed.`)),
+    error: msg => console.log(color.red(`ERROR: ${msg}`)),
+    compile: (inputPath, outputPath) => console.log(color.green(`${inputPath} was compiled to ${outputPath}`)),
+    change: (path) => console.log(color.yellow(`${path} was changed.`)),
+    add: (path) => console.log(color.blue(`${path} was added.`)),
+    ready: () => console.table(color.inverse(`[any-file-merge]`))
+};
 const entrypointsDefault = (entrypoints = {}) => {
     return {
-        ready: entrypoints.ready || noop,
-        error: entrypoints.error || noop,
-        change: entrypoints.change || noop,
-        unlink: entrypoints.delete || noop,
-        unlinkDir: entrypoints.delete || noop,
-        add: entrypoints.add || noop,
-        compile: entrypoints.compile || noop
+        ready: entrypoints.ready || defaultOutput.ready,
+        error: entrypoints.error || defaultOutput.error,
+        change: entrypoints.change || defaultOutput.change,
+        unlink: entrypoints.delete || defaultOutput.delete,
+        unlinkDir: entrypoints.delete || defaultOutput.delete,
+        add: entrypoints.add || defaultOutput.add,
+        compile: entrypoints.compile || defaultOutput.compile
     };
 };
 
@@ -44,16 +52,16 @@ exports.watcher = (
         watch,
         patterns,
         output,
-        outputExtension,
         processors = defaultProcessors,
         entrypoints,
-        filename
+        fileName,
+        quiet
     }
 ) => {
     const onEvent = entrypointsDefault(entrypoints);
     const requiredExtensions = mapRequiredProcessors(processors);
 
-    const sc = new SvelteCombine(fs, { output, outputExtension, processors, filename });
+    const sc = new AnyFileMerge(fs, { output, fileName, processors });
     const compile = relativePath => {
         try {
             sc.combine(relativePath);
@@ -64,26 +72,30 @@ exports.watcher = (
     };
 
     const onDeleted = (relativePath, relativeWatched) => {
-        const { dirStr, modulePath, name, ext } = resolvePath(relativePath, output);
-        rimraf.sync(`${dirStr}/${name}${ext}`);
+        const path = resolvePath(relativePath, output);
+        const { modulePath, name, ext } = path.input;
+        const { dir } = path.output;
+        rimraf.sync(`${dir.join('/')}/${name}${ext}`);
         // Recompile if part of the module was removed
         relativeWatched.filter(pathContains(`${modulePath}/${name}`)).forEach(compile);
     };
 
     const on = (watcher, eventType, callback) => watcher.on(eventType, (relativePath) => {
-        const path = relativePath ? replaceSlashes(relativePath) : null;
+        const inputPath = replaceSlashes(relativePath);
         const watched = relativePaths(watcher.getWatched());
 
-        onEvent[eventType](path, watched);
-        callback(path, watched);
+        onEvent[eventType](inputPath, watched);
+        callback(inputPath, watched);
     });
     const watcher = chokidar.watch(patterns, { persistent: watch, cwd: process.cwd() });
     watcher.on('error', onEvent.error);
     on(watcher, 'unlink', onDeleted);
     on(watcher, 'unlinkDir', onDeleted);
     on(watcher, 'change', compile);
-    on(watcher, 'ready', (_, relativeWatched) => {
-        relativeWatched.filter(pathMatches(requiredExtensions)).forEach(compile);
+    watcher.on('ready', () => {
+        const watched = relativePaths(watcher.getWatched())
+        watched.filter(pathMatches(requiredExtensions)).forEach(compile);
+        onEvent.ready(watched);
         on(watcher, 'add', compile);
     });
 }
