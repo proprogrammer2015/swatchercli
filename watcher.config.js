@@ -1,13 +1,14 @@
 const { Html, Js, Css } = require('any-file-merge');
 
+const ext = '.svelte';
 exports.watch = true;
 exports.quiet = false;
 exports.patterns = [
     './src/components/**',
-    '!./src/components/**/*.svelte'
+    `!./src/components/**/*${ext}`
 ];
-exports.output = './src';
-exports.fileName = '.svelte';
+exports.output = './output';
+exports.fileName = `${ext}`;
 exports.processors = [
     new Html(),
     new Js(),

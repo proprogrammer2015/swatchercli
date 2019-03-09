@@ -54,9 +54,13 @@ exports.watcher = (
     const onDeleted = (relativePath, relativeWatched) => {
         const path = resolvePath(relativePath, output);
         const ext = fileName.substr(0, fileName.lastIndexOf('.')) || fileName;
-        rimraf.sync(path.output.full.replace(/\.[^.]*$/, ext));
-        // Recompile if part of the module was removed
-        relativeWatched.filter(pathContains(`${path.input.modulePath}`)).forEach(compile);
+        if (path.input.ext === '') {
+            rimraf.sync(path.output.dir.join('/'));
+        } else {
+            rimraf.sync(path.output.full.replace(/\.[^.]*$/, ext));
+            // Recompile if part of the module was removed
+            relativeWatched.filter(pathContains(`${path.input.modulePath.join('/')}`)).forEach(compile);
+        }
     };
 
     const on = (watcher, eventType, callback) => watcher.on(eventType, (relativePath) => {
