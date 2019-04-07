@@ -18,10 +18,6 @@ swatchercli -s -o ./output -p ./src/**
 ```sh
 swatchercli -o ./output -p ./src/**
 ```
-### Using json configutaion
-```sh
-swatchercli -j ./path/to/watcher.config.json
-```
 ### Using js configutaion
 ```sh
 swatchercli -c ./path/to/watcher.config.js
